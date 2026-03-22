@@ -109,6 +109,35 @@ hr {
 }
 
 /*
+ * Table.
+ * ============================================================================
+ */
+table {
+    background-color: transparent;
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 20px;
+}
+tbody tr:hover {
+    background-color: #efefef;
+}
+th,
+td {
+    border: 1px solid #767676;
+    padding: 8px;
+}
+th {
+    text-align: left;
+    vertical-align: bottom;
+    background-color: antiquewhite;
+}
+td {
+    vertical-align: top;
+}
+
+/*
  * Form.
  * ============================================================================
  */
@@ -125,6 +154,7 @@ label + p {
 input[type="text"],
 input[type="email"],
 input[type="date"],
+input[type="number"],
 input[type="password"],
 textarea,
 select {
@@ -152,6 +182,9 @@ input[type="date"]:focus-visible,
 input[type="password"]:hover,
 input[type="password"]:active,
 input[type="password"]:focus-visible,
+input[type="number"]:hover,
+input[type="number"]:active,
+input[type="number"]:focus-visible,
 textarea:hover,
 textarea:active,
 textarea:focus-visible,

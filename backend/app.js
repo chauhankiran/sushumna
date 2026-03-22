@@ -49,17 +49,22 @@ const requireAuth = async (req, res, next) => {
     }
 
     try {
-        const found = await sql`
-            SELECT id
-            FROM tokens
-            WHERE token = ${sha(t)}
+        const ok = await sql`
+            SELECT
+                id,
+                "userId"
+            FROM
+                tokens
+            WHERE
+                token = ${sha(t)}
         `.then(([x]) => x);
 
-        if (!found) {
+        if (!ok) {
             return res.status(401).json({ error: "Unauthorized." });
         }
 
-        req.userTokenId = found.id;
+        req.userTokenId = ok.id;
+        req.userId = ok.userId;
         return next();
     } catch (error) {
         console.error(error);
@@ -223,6 +228,274 @@ app.get("/logout", async (req, res) => {
 
 app.get("/dashboard", requireAuth, (req, res) => {
     return res.json({ data: "Dashboard" });
+});
+
+app.get("/companies", requireAuth, (req, res) => {
+    sql`
+        SELECT
+            id,
+            name,
+            email,
+            phone,
+            city,
+            website,
+            "createdAt",
+            "updatedAt"
+        FROM companies
+        ORDER BY id DESC
+    `
+        .then((companies) => {
+            return res.json({ data: companies });
+        })
+        .catch((error) => {
+            console.error(error);
+            return res
+                .status(500)
+                .json({ error: "An error occurred while fetching companies." });
+        });
+});
+
+app.get("/companies/:id", requireAuth, async (req, res) => {
+    const companyId = Number(req.params.id);
+
+    if (!Number.isInteger(companyId) || companyId < 1) {
+        return res.status(400).json({ error: "Invalid company id." });
+    }
+
+    try {
+        const company = await sql`
+            SELECT
+                id,
+                name,
+                email,
+                phone,
+                mobile,
+                fax,
+                website,
+                "addressLine1",
+                "addressLine2",
+                city,
+                "stateId",
+                zip,
+                "countryId",
+                "statusId",
+                "stageId",
+                "sourceId",
+                "employeeSize",
+                "annualRevenue",
+                "industryId",
+                "typeId",
+                "assigneeId",
+                description,
+                "createdAt",
+                "updatedAt",
+                "createdBy",
+                "updatedBy",
+                "isActive"
+            FROM companies
+            WHERE id = ${companyId}
+        `.then(([x]) => x);
+
+        if (!company) {
+            return res.status(404).json({ error: "Company not found." });
+        }
+
+        return res.json({ data: company });
+    } catch (error) {
+        console.error(error);
+        return res
+            .status(500)
+            .json({ error: "An error occurred while fetching the company." });
+    }
+});
+
+app.post("/companies", requireAuth, async (req, res) => {
+    const {
+        name,
+        email,
+        phone,
+        mobile,
+        fax,
+        website,
+        addressLine1,
+        addressLine2,
+        city,
+        stateId,
+        zip,
+        countryId,
+        statusId,
+        stageId,
+        sourceId,
+        employeeSize,
+        annualRevenue,
+        industryId,
+        typeId,
+        assigneeId,
+        description,
+    } = req.body;
+
+    try {
+        const company = await sql`
+            INSERT INTO companies (
+                name,
+                email,
+                phone,
+                mobile,
+                fax,
+                website,
+                "addressLine1",
+                "addressLine2",
+                city,
+                "stateId",
+                zip,
+                "countryId",
+                "statusId",
+                "stageId",
+                "sourceId",
+                "employeeSize",
+                "annualRevenue",
+                "industryId",
+                "typeId",
+                "assigneeId",
+                description,
+                "createdBy"
+            ) VALUES (
+                ${name},
+                ${email},
+                ${phone},
+                ${mobile},
+                ${fax},
+                ${website},
+                ${addressLine1},
+                ${addressLine2},
+                ${city},
+                ${stateId},
+                ${zip},
+                ${countryId},
+                ${statusId},
+                ${stageId},
+                ${sourceId},
+                ${employeeSize},
+                ${annualRevenue},
+                ${industryId},
+                ${typeId},
+                ${assigneeId},
+                ${description},
+                ${req.userId}
+            ) RETURNING id
+        `.then(([x]) => x);
+
+        return res.status(201).json({ data: company.id });
+    } catch (error) {
+        console.error(error);
+        return res
+            .status(500)
+            .json({ error: "An error occurred while creating the company." });
+    }
+});
+
+app.put("/companies/:id", requireAuth, (req, res) => {
+    const companyId = Number(req.params.id);
+
+    if (!Number.isInteger(companyId) || companyId < 1) {
+        return res.status(400).json({ error: "Invalid company id." });
+    }
+
+    const {
+        name,
+        email,
+        phone,
+        mobile,
+        fax,
+        website,
+        addressLine1,
+        addressLine2,
+        city,
+        stateId,
+        zip,
+        countryId,
+        statusId,
+        stageId,
+        sourceId,
+        employeeSize,
+        annualRevenue,
+        industryId,
+        typeId,
+        assigneeId,
+        description,
+    } = req.body;
+
+    sql`
+        UPDATE companies
+        SET
+            name = ${name},
+            email = ${email},
+            phone = ${phone},
+            mobile = ${mobile},
+            fax = ${fax},
+            website = ${website},
+            "addressLine1" = ${addressLine1},
+            "addressLine2" = ${addressLine2},
+            city = ${city},
+            "stateId" = ${stateId},
+            zip = ${zip},
+            "countryId" = ${countryId},
+            "statusId" = ${statusId},
+            "stageId" = ${stageId},
+            "sourceId" = ${sourceId},
+            "employeeSize" = ${employeeSize},
+            "annualRevenue" = ${annualRevenue},
+            "industryId" = ${industryId},
+            "typeId" = ${typeId},
+            "assigneeId" = ${assigneeId},
+            description = ${description},
+            "updatedAt" = ${sql`NOW()`},
+            "updatedBy" = ${req.userId}
+        WHERE id = ${companyId}
+        RETURNING id
+    `
+        .then(([company]) => {
+            if (!company) {
+                return res.status(404).json({ error: "Company not found." });
+            }
+
+            return res.json({ data: company.id });
+        })
+        .catch((error) => {
+            console.error(error);
+            return res
+                .status(500)
+                .json({
+                    error: "An error occurred while updating the company.",
+                });
+        });
+});
+
+app.delete("/companies/:id", requireAuth, (req, res) => {
+    const companyId = Number(req.params.id);
+
+    if (!Number.isInteger(companyId) || companyId < 1) {
+        return res.status(400).json({ error: "Invalid company id." });
+    }
+
+    sql`
+        DELETE FROM companies
+        WHERE id = ${companyId}
+        RETURNING id
+    `
+        .then(([company]) => {
+            if (!company) {
+                return res.status(404).json({ error: "Company not found." });
+            }
+
+            return res.json({ data: company.id });
+        })
+        .catch((error) => {
+            console.error(error);
+            return res
+                .status(500)
+                .json({ error: "An error occurred while deleting the company." });
+        });
 });
 
 const PORT = process.env.PORT || 3000;
