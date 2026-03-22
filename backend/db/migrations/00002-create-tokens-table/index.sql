@@ -1,0 +1,9 @@
+CREATE TABLE "tokens" (
+    id BIGSERIAL PRIMARY KEY,
+
+    "userId" BIGINT NOT NULL,
+    "token" TEXT NOT NULL UNIQUE,
+
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    "createdBy" BIGINT
+);
