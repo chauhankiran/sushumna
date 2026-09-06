@@ -1,0 +1,16 @@
+{
+    "name": "sushumna",
+    "version": "0.0.1",
+    "description": "API Client for Experimentalist!",
+    "main": "main.js",
+    "type": "commonjs",
+    "scripts": {
+        "format": "prettier --write .",
+        "format:check": "prettier --check .",
+        "start": "electron ."
+    },
+    "devDependencies": {
+        "electron": "44.2.0",
+        "prettier": "3.9.6"
+    }
+}

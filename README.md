@@ -1,2 +1,3 @@
-# sushumna
-API Client for Experimentalist!
+# Sushumna
+
+> API Client for Experimentalist!
