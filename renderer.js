@@ -7,6 +7,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let isDragging = false;
 
+    // TODO: Re-arrange the 'side-panel-width' in global state.
+    // GET side-panel-width value.
+    const savedSidePanelWidth = localStorage.getItem('side-panel-width');
+    if (savedSidePanelWidth) {
+        sidePanel.style.width = savedSidePanelWidth;
+    } else {
+        sidePanel.style.width = '15%';
+    }
+
     resizer.addEventListener("mousedown", () => {
         isDragging = true;
         document.body.style.cursor = "col-resize";
@@ -39,11 +48,17 @@ document.addEventListener("DOMContentLoaded", () => {
             document.body.style.cursor = "";
             resizer.classList.remove("dragging");
             document.body.style.userSelect = "";
+
+            // SET side-panel-width value.
+            localStorage.setItem("side-panel-width", sidePanel.style.width);
         }
     });
 
     // Reset to initial 15% width on double click
     resizer.addEventListener("dblclick", () => {
         sidePanel.style.width = "15%";
+
+        // SET side-panel-width value.
+        localStorage.setItem("side-panel-width", sidePanel.style.width);
     });
 });
