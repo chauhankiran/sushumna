@@ -51,8 +51,24 @@ body {
     align-items: center;
 
     width: 15%;
+    flex-shrink: 0;
 
     height: 100%;
+}
+
+#resizer {
+    width: 6px;
+    cursor: col-resize;
+    background-color: transparent;
+    border-left: 1px solid #ddd;
+    z-index: 10;
+    transition: background-color 0.15s;
+    flex-shrink: 0;
+}
+
+#resizer:hover,
+#resizer.dragging {
+    background-color: rgba(0, 122, 204, 0.4);
 }
 
 #main-window {
@@ -60,9 +76,7 @@ body {
     justify-content: center;
     align-items: center;
 
-    border-left: 1px solid #ddd;
-
-    width: 85%;
+    flex: 1;
 
     height: 100%;
 }
