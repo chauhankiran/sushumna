@@ -9,11 +9,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // TODO: Re-arrange the 'side-panel-width' in global state.
     // GET side-panel-width value.
-    const savedSidePanelWidth = localStorage.getItem('side-panel-width');
+    const savedSidePanelWidth = localStorage.getItem("side-panel-width");
     if (savedSidePanelWidth) {
         sidePanel.style.width = savedSidePanelWidth;
     } else {
-        sidePanel.style.width = '15%';
+        sidePanel.style.width = "15%";
     }
 
     resizer.addEventListener("mousedown", () => {
